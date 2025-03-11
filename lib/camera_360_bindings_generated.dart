@@ -28,21 +28,45 @@ class Camera360Bindings {
 
   /// Shared declaration
   bool stitch(
-    ffi.Pointer<ffi.Char> arg0,
-    ffi.Pointer<ffi.Char> arg1,
+    ffi.Pointer<ffi.Char> inputImagePath,
+    ffi.Pointer<ffi.Char> outputImagePath,
     bool cropped,
+    double confidenceThreshold,
+    double panoConfidenceThresh,
+    int waveCorrection,
+    int exposureCompensator,
+    double registrationResol,
+    int featureMatcherType,
+    int featureDetectionMethod,
   ) {
     return _stitch(
-      arg0,
-      arg1,
+      inputImagePath,
+      outputImagePath,
       cropped,
+      confidenceThreshold,
+      panoConfidenceThresh,
+      waveCorrection,
+      exposureCompensator,
+      registrationResol,
+      featureMatcherType,
+      featureDetectionMethod,
     );
   }
 
   late final _stitchPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Bool Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>,
-              ffi.Bool)>>('stitch');
+          ffi.Bool Function(
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Bool,
+              ffi.Double,
+              ffi.Double,
+              ffi.Int,
+              ffi.Int,
+              ffi.Double,
+              ffi.Int,
+              ffi.Int)>>('stitch');
   late final _stitch = _stitchPtr.asFunction<
-      bool Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, bool)>();
+      bool Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, bool, double,
+          double, int, int, double, int, int)>();
 }

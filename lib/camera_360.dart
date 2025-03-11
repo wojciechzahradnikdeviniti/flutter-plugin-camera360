@@ -1,6 +1,7 @@
 import 'package:camera_360/layouts/camera_selector.dart';
 import 'package:camera_360/layouts/helper_text.dart';
 import 'package:camera_360/layouts/orientation_helpers.dart';
+import 'package:camera_360/models/stitcher_settings.dart';
 import 'package:camera_360/utilities/stitcher.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -10,6 +11,9 @@ import 'dart:async';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 import 'dart:io';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+export 'package:camera_360/models/stitcher_settings.dart';
+export 'package:camera_360/models/enums/enums.dart';
 
 class Camera360 extends StatefulWidget {
   /// Callback called when capture has ended and panorama is prepared
@@ -67,6 +71,9 @@ class Camera360 extends StatefulWidget {
   /// Camera not ready content [Widget]
   final Widget? cameraNotReadyContent;
 
+  /// Custom stitcher settings
+  final StitcherSettings? stitcherSettings;
+
   const Camera360({
     Key? key,
     required this.onCaptureEnded,
@@ -86,6 +93,7 @@ class Camera360 extends StatefulWidget {
     this.cameraSelectorInfoPopUpContent,
     this.cameraNotReadyContent,
     this.userCheckStitchingDuringCapture = false,
+    this.stitcherSettings,
   }) : super(key: key);
 
   @override
@@ -426,7 +434,11 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
         ];
 
         try {
-          testStichingImage = await Stitcher.stitchImages(toStitch, false);
+          testStichingImage = await Stitcher.stitchImages(
+            toStitch,
+            false,
+            settings: widget.stitcherSettings,
+          );
           nrGoBacksDone = 0;
           prepareForNextImageCatpure();
         } catch (error) {
@@ -677,8 +689,11 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
         isPanoramaBeingStitched = true;
 
         try {
-          finalStitchedImage =
-              await Stitcher.stitchImages(capturedImages, true);
+          finalStitchedImage = await Stitcher.stitchImages(
+            capturedImages,
+            true,
+            settings: widget.stitcherSettings,
+          );
           isPanoramaBeingStitched = false;
 
           // Callback function
@@ -698,10 +713,15 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
   bool morePhotosNeeded() {
     if (checkStitchingDuringCapture == false) {
       // If stitching during capture is disabled then check if all photos are taken
+      //TODO replace this
       if (nrPhotosTaken == 4) {
         return false;
       }
     } else {
+      //TODO replace this
+      if (nrPhotosTaken == 4) {
+        return false;
+      }
       // If next (to reach) horizontal position is <= 360 then allow to take more photos
       // Last photo should be as close as possible to 360 DEG
 

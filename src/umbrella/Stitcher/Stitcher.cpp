@@ -1,16 +1,11 @@
 #include "Stitcher.h"
 
-/*
-Copyright (c) 2021, azad prajapat
-https://github.com/azadprajapat/opencv_awesome/blob/master/android/src/main/jni/native_opencv.cpp
-
-Copyright (c) 2022, 小島 伊織 / Iori Kojima
-*/
-
-// 複数の画像をパノラマ画像にstitchする
 #include "opencv2/opencv.hpp"
 #include "opencv2/stitching.hpp"
 #include "opencv2/imgproc.hpp"
+#include "opencv2/features2d.hpp"
+#include "opencv2/stitching/detail/matchers.hpp"
+
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
 #endif
@@ -137,35 +132,6 @@ vector<string> getpathlist(string path_string)
     return pathlist;
 }
 
-Mat process_stitching(vector<Mat> imgVec)
-{
-    Mat result = Mat();
-    Stitcher::Mode mode = Stitcher::PANORAMA;
-    Ptr<Stitcher> stitcher = Stitcher::create(mode);
-
-    // Handle cv::Exception
-    try
-    {
-        Stitcher::Status status = stitcher->stitch(imgVec, result);
-        // If stitching failed
-        if (status != Stitcher::OK)
-        {
-            // hconcat(imgVec, result);
-            printf("'Stitcher': Stitching error: %d\n", status);
-            return Mat();
-        }
-
-        printf("'Stitcher': Stitching success here\n");
-        cvtColor(result, result, COLOR_RGB2BGR);
-        return result;
-    }
-    catch (cv::Exception &e)
-    {
-        printf("'Stitcher': Stitching error cv::Exception: %s\n", e.err.c_str());
-        return Mat();
-    }
-}
-
 vector<Mat> convert_to_matlist(vector<string> img_list, bool isvertical)
 {
     vector<Mat> imgVec;
@@ -199,7 +165,10 @@ vector<Mat> convert_to_matlist(vector<string> img_list, bool isvertical)
     return imgVec;
 }
 
-bool stitch(char *inputImagePath, char *outputImagePath, bool cropped)
+bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
+            double confidenceThreshold, double panoConfidenceThresh,
+            int waveCorrection, int exposureCompensator,
+            double registrationResol, int featureMatcherType, int featureDetectionMethod)
 {
     string input_path_string = inputImagePath;
     vector<string> image_vector_list = getpathlist(input_path_string);
@@ -212,36 +181,133 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped)
         printf("'Stitcher': Stitching failed because some images didn't exist\n");
         return false;
     }
-    // Process stitching
-    Mat result = process_stitching(mat_list);
 
-    // Check if stitching failed
-    if (result.empty())
+    // Process stitching with custom settings
+    Mat result;
+    Stitcher::Mode mode = Stitcher::PANORAMA;
+    Ptr<Stitcher> stitcher = Stitcher::create(mode);
+
+    // Apply wave correction based on the selected type
+    switch (waveCorrection)
     {
-        return false;
+    case 0: // None
+        stitcher->setWaveCorrection(false);
+        break;
+    case 1: // Horizontal
+        stitcher->setWaveCorrection(true);
+        stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_HORIZ);
+        break;
+    case 2: // Vertical
+        stitcher->setWaveCorrection(true);
+        stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_VERT);
+        break;
+    default: // Default to horizontal
+        stitcher->setWaveCorrection(true);
+        stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_HORIZ);
+        break;
     }
 
-    if (cropped == true)
+    // Set registration resolution
+    stitcher->setRegistrationResol(registrationResol);
+
+    // Set exposure compensator based on the selected type
+    switch (exposureCompensator)
     {
-        // Crop black background
-        Mat withoutBlackBg;
-        if (cropWithMat(result, withoutBlackBg) == true)
+    case 0:
+        stitcher->setExposureCompensator(makePtr<detail::NoExposureCompensator>());
+        break;
+    case 1:
+        stitcher->setExposureCompensator(makePtr<detail::GainCompensator>());
+        break;
+    case 2:
+        stitcher->setExposureCompensator(makePtr<detail::BlocksGainCompensator>());
+        break;
+    default:
+        stitcher->setExposureCompensator(makePtr<detail::GainCompensator>());
+        break;
+    }
+
+    // Set feature matcher based on type
+    float match_conf = confidenceThreshold > 0 ? static_cast<float>(confidenceThreshold) : 0.3f;
+
+    if (featureMatcherType == 1)
+    { // Affine
+        stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(false, match_conf));
+    }
+    else
+    { // Homography (default)
+        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(false, match_conf));
+    }
+
+    // Set the confidence threshold for panorama
+    // Use the value passed from Dart, or default to 1.0 if not specified
+    float conf_thresh = panoConfidenceThresh > 0 ? static_cast<float>(panoConfidenceThresh) : 1.0f;
+    stitcher->setPanoConfidenceThresh(conf_thresh);
+
+    // Set feature finder based on the selected method
+    // Following the approach from the OpenCV stitching example
+    Ptr<Feature2D> finder;
+    switch (featureDetectionMethod)
+    {
+    case 0: // SIFT
+        finder = SIFT::create();
+        break;
+    case 1: // AKAZE
+        finder = AKAZE::create();
+        break;
+    case 2: // ORB
+        finder = ORB::create();
+        break;
+    default:
+        // Default to ORB as it's most likely to be available
+        finder = ORB::create();
+        break;
+    }
+
+    // Create a feature finder that uses the selected algorithm
+    stitcher->setFeaturesFinder(finder);
+
+    // Handle cv::Exception
+    try
+    {
+        Stitcher::Status status = stitcher->stitch(mat_list, result);
+        // If stitching failed
+        if (status != Stitcher::OK)
         {
-            imwrite(outputImagePath, withoutBlackBg);
-            printf("'Stitcher': Image cropped successfully\n");
-            return true;
+            printf("'Stitcher': Stitching error: %d\n", status);
+            return false;
+        }
+
+        printf("'Stitcher': Stitching success here\n");
+        cvtColor(result, result, COLOR_RGB2BGR);
+
+        if (cropped == true)
+        {
+            // Crop black background
+            Mat withoutBlackBg;
+            if (cropWithMat(result, withoutBlackBg) == true)
+            {
+                imwrite(outputImagePath, withoutBlackBg);
+                printf("'Stitcher': Image cropped successfully\n");
+                return true;
+            }
+            else
+            {
+                printf("'Stitcher': Image cropping failed\n");
+                return false;
+            }
         }
         else
         {
-            printf("'Stitcher': Image cropping failed\n");
-            return false;
+            Mat cropped_image;
+            result(Rect(0, 0, result.cols, result.rows)).copyTo(cropped_image);
+            imwrite(outputImagePath, cropped_image);
+            return true;
         }
     }
-    else
+    catch (cv::Exception &e)
     {
-        Mat cropped_image;
-        result(Rect(0, 0, result.cols, result.rows)).copyTo(cropped_image);
-        imwrite(outputImagePath, cropped_image);
-        return true;
+        printf("'Stitcher': Stitching error cv::Exception: %s\n", e.err.c_str());
+        return false;
     }
 }

@@ -2,6 +2,10 @@ import 'package:camera_360/camera_360.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
+import 'widgets/stitcher_settings_panel.dart';
+import 'widgets/settings_toggle_button.dart';
+import 'widgets/panorama_preview_dialog.dart';
+import 'widgets/reset_button.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,26 +45,65 @@ class CameraPage extends StatefulWidget {
 }
 
 class _CameraPageState extends State<CameraPage> {
-  int progressPecentage = 0;
+  int progressPercentage = 0;
+  bool isSettingsVisible = false;
+  // Key to force rebuild of Camera360 widget
+  Key _cameraKey = UniqueKey();
+
+  StitcherSettings stitcherSettings = const StitcherSettings(
+    confidenceThreshold: 0.3,
+    panoConfidenceThresh: 1.0,
+    waveCorrection: WaveCorrectionType.horizontal,
+    exposureCompensator: ExposureCompensatorType.gainBlocks,
+    registrationResol: 0.6,
+    featureMatcherType: FeatureMatcherType.homography,
+    featureDetectionMethod: FeatureDetectionMethod.sift,
+  );
+
+  void _toggleSettingsVisibility() {
+    setState(() {
+      isSettingsVisible = !isSettingsVisible;
+    });
+  }
+
+  void _updateSettings(StitcherSettings newSettings) {
+    setState(() {
+      stitcherSettings = newSettings;
+    });
+  }
+
+  void _resetCamera() {
+    // Reset the camera by recreating the Camera360 widget with a new key
+    setState(() {
+      progressPercentage = 0;
+      // Create a new key to force rebuild
+      _cameraKey = UniqueKey();
+    });
+
+    // Display a message to the user
+    displayPanoramaMessage(context, 'Camera reset');
+  }
+
+  // Helper method to display messages
+  void displayPanoramaMessage(BuildContext context, String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
-    void displayPanoramaMessage(context, String message) {
-      final snackBar = SnackBar(
-        content: Text(message),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    }
-
     return Stack(
       children: [
         Camera360(
+          key: _cameraKey,
           // Determines when image stitching is performed.
           // If set to true, the application will check if each newly captured image
           // can be stitched with the previous one immediately after capture.
           // If set to false, all images will be captured first,
           // and stitching will be performed at the end.
-          userCheckStitchingDuringCapture: false,
+          userCheckStitchingDuringCapture: true,
           // Text shown while panorama image is being prepared
           userLoadingText: "Preparing panorama...",
           // Text shown on while taking the first image
@@ -76,6 +119,8 @@ class _CameraPageState extends State<CameraPage> {
           cameraSelectorShow: true,
           // Camera selector Info Visibilitiy
           cameraSelectorInfoPopUpShow: true,
+          // Custom stitcher settings
+          stitcherSettings: stitcherSettings,
           // Camera selector Info Widget
           cameraSelectorInfoPopUpContent: const Column(
             children: [
@@ -104,6 +149,16 @@ class _CameraPageState extends State<CameraPage> {
               // Save image to the gallery
               XFile panorama = data['panorama'];
               GallerySaver.saveImage(panorama.path);
+
+              // Show preview dialog
+              showDialog(
+                context: context,
+                barrierDismissible: true,
+                builder: (context) => PanoramaPreviewDialog(
+                  panorama: panorama,
+                ),
+              );
+
               displayPanoramaMessage(context, 'Panorama saved!');
             } else {
               displayPanoramaMessage(context, 'Panorama failed!');
@@ -118,21 +173,70 @@ class _CameraPageState extends State<CameraPage> {
           onProgressChanged: (newProgressPercentage) {
             debugPrint(
                 "'Panorama360': Progress changed: $newProgressPercentage");
-            setState(() {
-              progressPecentage = newProgressPercentage;
+            // Use addPostFrameCallback to avoid calling setState during build
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  progressPercentage = newProgressPercentage;
+                });
+              }
             });
           },
         ),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Progress: $progressPecentage",
-              style: const TextStyle(
-                  color: Colors.white, backgroundColor: Colors.black),
-            )
-          ],
+
+        // Progress indicator
+        Positioned(
+          top: 20,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "Progress: $progressPercentage%",
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
         ),
+
+        // Settings toggle button
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: SettingsToggleButton(
+            isSettingsVisible: isSettingsVisible,
+            onPressed: _toggleSettingsVisibility,
+          ),
+        ),
+
+        // Reset button
+        Positioned(
+          bottom: 20,
+          left: 20,
+          child: ResetButton(
+            onPressed: _resetCamera,
+          ),
+        ),
+
+        // Settings panel
+        if (isSettingsVisible)
+          Positioned(
+            bottom: 80,
+            left: 0,
+            right: 0,
+            child: StitcherSettingsPanel(
+              settings: stitcherSettings,
+              onSettingsChanged: _updateSettings,
+            ),
+          ),
       ],
     );
   }
