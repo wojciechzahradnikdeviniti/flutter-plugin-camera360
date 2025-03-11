@@ -28,3 +28,5 @@ migrate_working_dir/
 .dart_tool/
 .packages
 build/
+src/macos/test_images/
+src/macos/stitcher_test
