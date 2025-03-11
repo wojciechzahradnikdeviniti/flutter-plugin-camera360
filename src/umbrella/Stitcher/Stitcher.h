@@ -10,7 +10,8 @@ extern "C"
                 double confidenceThreshold, double panoConfidenceThresh,
                 int waveCorrection, int exposureCompensator,
                 double registrationResol, int featureMatcherType,
-                int featureDetectionMethod, int featureMatcherImageRange);
+                int featureDetectionMethod, int featureMatcherImageRange,
+                int blenderType);
 
 #ifdef __cplusplus
 } // closing brace for extern "C"

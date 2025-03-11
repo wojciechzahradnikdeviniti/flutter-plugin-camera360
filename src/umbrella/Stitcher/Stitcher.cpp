@@ -169,7 +169,8 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
             double confidenceThreshold, double panoConfidenceThresh,
             int waveCorrection, int exposureCompensator,
             double registrationResol, int matcherType,
-            int featureDetectionMethod, int featureMatcherImageRange)
+            int featureDetectionMethod, int featureMatcherImageRange,
+            int blenderType)
 {
     string input_path_string = inputImagePath;
     vector<string> image_vector_list = getpathlist(input_path_string);
@@ -225,6 +226,23 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
         break;
     default:
         stitcher->setExposureCompensator(makePtr<detail::GainCompensator>());
+        break;
+    }
+
+    // Set blender based on the selected type
+    switch (blenderType)
+    {
+    case 0:                                                       // None
+        stitcher->setBlender(makePtr<detail::FeatherBlender>(0)); // 0 sharpness means no blending
+        break;
+    case 1: // Feather
+        stitcher->setBlender(makePtr<detail::FeatherBlender>(0.05f));
+        break;
+    case 2: // Multiband
+        stitcher->setBlender(makePtr<detail::MultiBandBlender>());
+        break;
+    default: // Default to multiband
+        stitcher->setBlender(makePtr<detail::MultiBandBlender>());
         break;
     }
 

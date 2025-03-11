@@ -49,6 +49,15 @@ class StitcherSettings {
   /// If set to a positive value, the feature matcher will use the BestOf2NearestRangeMatcher
   final int featureMatcherImageRange;
 
+  /// Blending method used to combine images
+  /// Default is multiband
+  ///
+  /// Controls how images are blended together:
+  /// - none: No blending
+  /// - feather: Feather blending
+  /// - multiband: Multiband blending (default, best quality)
+  final BlenderType blenderType;
+
   /// Creates a new instance of [StitcherSettings] with default values
   const StitcherSettings({
     this.confidenceThreshold = 0.3,
@@ -59,6 +68,7 @@ class StitcherSettings {
     this.featureMatcherType = FeatureMatcherType.homography,
     this.featureDetectionMethod = FeatureDetectionMethod.orb,
     this.featureMatcherImageRange = -1,
+    this.blenderType = BlenderType.multiband,
   });
 
   /// Creates a copy of this [StitcherSettings] with the given fields replaced with new values
@@ -71,6 +81,7 @@ class StitcherSettings {
     FeatureMatcherType? featureMatcherType,
     FeatureDetectionMethod? featureDetectionMethod,
     int? featureMatcherImageRange,
+    BlenderType? blenderType,
   }) {
     return StitcherSettings(
       confidenceThreshold: confidenceThreshold ?? this.confidenceThreshold,
@@ -83,6 +94,7 @@ class StitcherSettings {
           featureDetectionMethod ?? this.featureDetectionMethod,
       featureMatcherImageRange:
           featureMatcherImageRange ?? this.featureMatcherImageRange,
+      blenderType: blenderType ?? this.blenderType,
     );
   }
 
@@ -97,6 +109,7 @@ class StitcherSettings {
       'featureMatcherType': featureMatcherType.value,
       'featureDetectionMethod': featureDetectionMethod.value,
       'featureMatcherImageRange': featureMatcherImageRange,
+      'blenderType': blenderType.value,
     };
   }
 
@@ -119,6 +132,9 @@ class StitcherSettings {
           ? FeatureDetectionMethod.fromValue(map['featureDetectionMethod'])
           : FeatureDetectionMethod.sift,
       featureMatcherImageRange: map['featureMatcherImageRange'] ?? -1,
+      blenderType: map['blenderType'] != null
+          ? BlenderType.fromValue(map['blenderType'])
+          : BlenderType.multiband,
     );
   }
 }

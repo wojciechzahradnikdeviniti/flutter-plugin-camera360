@@ -60,6 +60,7 @@ class _CameraPageState extends State<CameraPage> {
     featureMatcherType: FeatureMatcherType.homography,
     featureDetectionMethod: FeatureDetectionMethod.akaze,
     featureMatcherImageRange: 5,
+    blenderType: BlenderType.multiband,
   );
 
   void _toggleSettingsVisibility() {

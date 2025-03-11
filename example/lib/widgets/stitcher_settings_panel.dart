@@ -239,6 +239,34 @@ class _StitcherSettingsPanelState extends State<StitcherSettingsPanel> {
               },
             ),
 
+            // Blender Type
+            _buildDropdownSetting<BlenderType>(
+              title: 'Blender Type',
+              subtitle: 'Method used to blend images together',
+              value: _currentSettings.blenderType,
+              items: BlenderType.values,
+              itemBuilder: (type) {
+                switch (type) {
+                  case BlenderType.none:
+                    return 'None (no blending)';
+                  case BlenderType.feather:
+                    return 'Feather (simple blending)';
+                  case BlenderType.multiband:
+                    return 'Multiband (best quality, default)';
+                }
+              },
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _currentSettings = _currentSettings.copyWith(
+                      blenderType: value,
+                    );
+                  });
+                  widget.onSettingsChanged(_currentSettings);
+                }
+              },
+            ),
+
             const SizedBox(height: 16),
 
             // Reset button

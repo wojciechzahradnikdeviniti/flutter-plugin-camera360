@@ -51,6 +51,7 @@ class Stitcher {
       settings.featureMatcherType.value,
       settings.featureDetectionMethod.value,
       settings.featureMatcherImageRange,
+      settings.blenderType.value,
     );
 
     if (!isStiched) {

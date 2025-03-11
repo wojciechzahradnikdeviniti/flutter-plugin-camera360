@@ -40,14 +40,15 @@ import 'package:image_picker/image_picker.dart';
 Camera360(
   // Custom stitcher settings
   stitcherSettings: const StitcherSettings(
-    confidenceThreshold: 0.3,
-    panoConfidenceThresh: 1.0,
-    waveCorrection: WaveCorrectionType.horizontal,
-    exposureCompensator: ExposureCompensatorType.gainBlocks,
-    registrationResol: 0.6,
-    featureMatcherType: FeatureMatcherType.homography,
-    featureDetectionMethod: FeatureDetectionMethod.sift,
-    featureMatcherImageRange: -1,
+    confidenceThreshold : 0.3,
+    panoConfidenceThresh : 1.0,
+    waveCorrection : WaveCorrectionType.horizontal,
+    exposureCompensator : ExposureCompensatorType.gainBlocks,
+    registrationResol : 0.6, // Default OpenCV value
+    featureMatcherType : FeatureMatcherType.homography,
+    featureDetectionMethod : FeatureDetectionMethod.orb,
+    featureMatcherImageRange : -1,
+    blenderType : BlenderType.multiband,
   ),
   // Determines when image stitching is performed.
   // If set to true, the application will check if each newly captured image
