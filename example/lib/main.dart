@@ -53,13 +53,12 @@ class _CameraPageState extends State<CameraPage> {
   // Optimized for indoor use
   StitcherSettings stitcherSettings = const StitcherSettings(
     confidenceThreshold: 0.25,
-    panoConfidenceThresh: 0.5,
+    panoConfidenceThresh: 0.7,
     waveCorrection: WaveCorrectionType.horizontal,
-    exposureCompensator: ExposureCompensatorType.gainBlocks,
-    registrationResol: 0.6,
+    registrationResol: 0.8,
     featureMatcherType: FeatureMatcherType.homography,
     featureDetectionMethod: FeatureDetectionMethod.akaze,
-    featureMatcherImageRange: 5,
+    featureMatcherImageRange: -1,
     blenderType: BlenderType.multiband,
   );
 
@@ -101,6 +100,7 @@ class _CameraPageState extends State<CameraPage> {
       children: [
         Camera360(
           key: _cameraKey,
+          userNrPhotos: 12,
           // Determines when image stitching is performed.
           // If set to true, the application will check if each newly captured image
           // can be stitched with the previous one immediately after capture.

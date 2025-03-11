@@ -122,35 +122,6 @@ class _StitcherSettingsPanelState extends State<StitcherSettingsPanel> {
                 }
               },
             ),
-
-            // Exposure Compensator Type
-            _buildDropdownSetting<ExposureCompensatorType>(
-              title: 'Exposure Compensator',
-              subtitle: 'Method used to balance exposure between images',
-              value: _currentSettings.exposureCompensator,
-              items: ExposureCompensatorType.values,
-              itemBuilder: (type) {
-                switch (type) {
-                  case ExposureCompensatorType.none:
-                    return 'None';
-                  case ExposureCompensatorType.gain:
-                    return 'Gain';
-                  case ExposureCompensatorType.gainBlocks:
-                    return 'Gain Blocks (default)';
-                }
-              },
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _currentSettings = _currentSettings.copyWith(
-                      exposureCompensator: value,
-                    );
-                  });
-                  widget.onSettingsChanged(_currentSettings);
-                }
-              },
-            ),
-
             // Registration Resolution
             _buildSliderSetting(
               title: 'Registration Resolution',
