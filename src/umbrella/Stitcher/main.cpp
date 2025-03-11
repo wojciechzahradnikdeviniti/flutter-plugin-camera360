@@ -14,7 +14,7 @@ void printUsage()
   std::cout << "  --registration-resol=<resolution>      Registration resolution (default: 0.6)" << std::endl;
   std::cout << "  --matcher-type=<0|1>                   Matcher type (0=Homography, 1=Affine, default: 0)" << std::endl;
   std::cout << "  --feature-detection=<0|1|2>            Feature detection method (0=SIFT, 1=AKAZE, 2=ORB, default: 2)" << std::endl;
-  std::cout << "  --feature-matcher-range=<range>        Feature matcher image range (default: 1)" << std::endl;
+  std::cout << "  --feature-matcher-range=<range>        Feature matcher image range (default: -1)" << std::endl;
   std::cout << "  --blender-type=<0|1|2>                 Blender type (0=None, 1=Feather, 2=Multiband, default: 2)" << std::endl;
 }
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   double registrationResol = getDoubleOption("--registration-resol", argc, argv, 0.6);
   int matcherType = getIntOption("--matcher-type", argc, argv, 0);
   int featureDetectionMethod = getIntOption("--feature-detection", argc, argv, 2);
-  int featureMatcherImageRange = getIntOption("--feature-matcher-range", argc, argv, 1);
+  int featureMatcherImageRange = getIntOption("--feature-matcher-range", argc, argv, -1);
   int blenderType = getIntOption("--blender-type", argc, argv, 2);
 
   // Print the parameters
