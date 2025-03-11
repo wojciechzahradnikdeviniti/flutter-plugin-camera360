@@ -713,15 +713,10 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
   bool morePhotosNeeded() {
     if (checkStitchingDuringCapture == false) {
       // If stitching during capture is disabled then check if all photos are taken
-      //TODO replace this
-      if (nrPhotosTaken == 4) {
+      if (nrPhotosTaken == nrPhotos) {
         return false;
       }
     } else {
-      //TODO replace this
-      if (nrPhotosTaken == 4) {
-        return false;
-      }
       // If next (to reach) horizontal position is <= 360 then allow to take more photos
       // Last photo should be as close as possible to 360 DEG
 

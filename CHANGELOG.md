@@ -1,3 +1,7 @@
+## 1.1.3
+
+- Added: StitcherSettings to update the stitcher settings directly from the dart interface
+
 ## 1.1.2
 
 - Update: Bumped dchs_motion_sensors to 2.0.1

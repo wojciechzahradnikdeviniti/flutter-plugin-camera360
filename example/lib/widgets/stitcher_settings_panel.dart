@@ -170,7 +170,7 @@ class _StitcherSettingsPanelState extends State<StitcherSettingsPanel> {
             ),
 
             // Use Best Of 2 Nearest Matcher
-            _buildDropdownSetting(
+            _buildDropdownSetting<FeatureMatcherType>(
               title: 'Feature Matcher',
               subtitle: 'Improves feature matching quality',
               value: _currentSettings.featureMatcherType,
@@ -220,6 +220,22 @@ class _StitcherSettingsPanelState extends State<StitcherSettingsPanel> {
                   });
                   widget.onSettingsChanged(_currentSettings);
                 }
+              },
+            ),
+
+            // Feature Matcher Image Range
+            _buildNumberInputSetting(
+              title: 'Feature Matcher Image Range',
+              subtitle:
+                  'Limits the number of images to match with each other. Set to -1 to match with all images, or a positive value (e.g., 3) to match only with that many nearby images.',
+              value: _currentSettings.featureMatcherImageRange,
+              onChanged: (value) {
+                setState(() {
+                  _currentSettings = _currentSettings.copyWith(
+                    featureMatcherImageRange: value,
+                  );
+                });
+                widget.onSettingsChanged(_currentSettings);
               },
             ),
 
@@ -387,6 +403,92 @@ class _StitcherSettingsPanelState extends State<StitcherSettingsPanel> {
             }).toList(),
             onChanged: onChanged,
           ),
+        ),
+        const SizedBox(height: 8),
+        const Divider(color: Colors.white24),
+      ],
+    );
+  }
+
+  Widget _buildNumberInputSetting({
+    required String title,
+    required String subtitle,
+    required int value,
+    required ValueChanged<int> onChanged,
+  }) {
+    final TextEditingController controller =
+        TextEditingController(text: value.toString());
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            // Minus button
+            IconButton(
+              icon:
+                  const Icon(Icons.remove_circle_outline, color: Colors.white),
+              onPressed: () {
+                final newValue = value - 1;
+                controller.text = newValue.toString();
+                onChanged(newValue);
+              },
+            ),
+            // Text field
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white24),
+                ),
+                child: TextField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Colors.white),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (text) {
+                    if (text.isEmpty) return;
+                    try {
+                      final newValue = int.parse(text);
+                      onChanged(newValue);
+                    } catch (e) {
+                      // Reset to previous value if not a valid number
+                      controller.text = value.toString();
+                    }
+                  },
+                ),
+              ),
+            ),
+            // Plus button
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline, color: Colors.white),
+              onPressed: () {
+                final newValue = value + 1;
+                controller.text = newValue.toString();
+                onChanged(newValue);
+              },
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         const Divider(color: Colors.white24),

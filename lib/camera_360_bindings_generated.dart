@@ -38,6 +38,7 @@ class Camera360Bindings {
     double registrationResol,
     int featureMatcherType,
     int featureDetectionMethod,
+    int featureMatcherImageRange,
   ) {
     return _stitch(
       inputImagePath,
@@ -50,6 +51,7 @@ class Camera360Bindings {
       registrationResol,
       featureMatcherType,
       featureDetectionMethod,
+      featureMatcherImageRange,
     );
   }
 
@@ -65,8 +67,9 @@ class Camera360Bindings {
               ffi.Int,
               ffi.Double,
               ffi.Int,
+              ffi.Int,
               ffi.Int)>>('stitch');
   late final _stitch = _stitchPtr.asFunction<
       bool Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, bool, double,
-          double, int, int, double, int, int)>();
+          double, int, int, double, int, int, int)>();
 }

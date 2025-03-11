@@ -50,6 +50,7 @@ class Stitcher {
       settings.registrationResol,
       settings.featureMatcherType.value,
       settings.featureDetectionMethod.value,
+      settings.featureMatcherImageRange,
     );
 
     if (!isStiched) {

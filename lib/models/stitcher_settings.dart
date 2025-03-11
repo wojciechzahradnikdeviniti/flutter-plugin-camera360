@@ -42,6 +42,13 @@ class StitcherSettings {
   /// Default is ORB
   final FeatureDetectionMethod featureDetectionMethod;
 
+  /// Image range width for feature matching
+  /// Limits the number of images to match with each other
+  /// Default is -1 (match with all images)
+  /// Set to a positive value (e.g., 3) to match only with that many nearby images
+  /// If set to a positive value, the feature matcher will use the BestOf2NearestRangeMatcher
+  final int featureMatcherImageRange;
+
   /// Creates a new instance of [StitcherSettings] with default values
   const StitcherSettings({
     this.confidenceThreshold = 0.3,
@@ -51,6 +58,7 @@ class StitcherSettings {
     this.registrationResol = 0.6, // Default OpenCV value
     this.featureMatcherType = FeatureMatcherType.homography,
     this.featureDetectionMethod = FeatureDetectionMethod.orb,
+    this.featureMatcherImageRange = -1,
   });
 
   /// Creates a copy of this [StitcherSettings] with the given fields replaced with new values
@@ -62,6 +70,7 @@ class StitcherSettings {
     double? registrationResol,
     FeatureMatcherType? featureMatcherType,
     FeatureDetectionMethod? featureDetectionMethod,
+    int? featureMatcherImageRange,
   }) {
     return StitcherSettings(
       confidenceThreshold: confidenceThreshold ?? this.confidenceThreshold,
@@ -72,6 +81,8 @@ class StitcherSettings {
       featureMatcherType: featureMatcherType ?? this.featureMatcherType,
       featureDetectionMethod:
           featureDetectionMethod ?? this.featureDetectionMethod,
+      featureMatcherImageRange:
+          featureMatcherImageRange ?? this.featureMatcherImageRange,
     );
   }
 
@@ -85,6 +96,7 @@ class StitcherSettings {
       'registrationResol': registrationResol,
       'featureMatcherType': featureMatcherType.value,
       'featureDetectionMethod': featureDetectionMethod.value,
+      'featureMatcherImageRange': featureMatcherImageRange,
     };
   }
 
@@ -106,6 +118,7 @@ class StitcherSettings {
       featureDetectionMethod: map['featureDetectionMethod'] != null
           ? FeatureDetectionMethod.fromValue(map['featureDetectionMethod'])
           : FeatureDetectionMethod.sift,
+      featureMatcherImageRange: map['featureMatcherImageRange'] ?? -1,
     );
   }
 }

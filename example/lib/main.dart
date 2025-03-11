@@ -50,14 +50,16 @@ class _CameraPageState extends State<CameraPage> {
   // Key to force rebuild of Camera360 widget
   Key _cameraKey = UniqueKey();
 
+  // Optimized for indoor use
   StitcherSettings stitcherSettings = const StitcherSettings(
-    confidenceThreshold: 0.3,
-    panoConfidenceThresh: 1.0,
+    confidenceThreshold: 0.25,
+    panoConfidenceThresh: 0.5,
     waveCorrection: WaveCorrectionType.horizontal,
     exposureCompensator: ExposureCompensatorType.gainBlocks,
     registrationResol: 0.6,
     featureMatcherType: FeatureMatcherType.homography,
-    featureDetectionMethod: FeatureDetectionMethod.sift,
+    featureDetectionMethod: FeatureDetectionMethod.akaze,
+    featureMatcherImageRange: 5,
   );
 
   void _toggleSettingsVisibility() {
@@ -103,7 +105,7 @@ class _CameraPageState extends State<CameraPage> {
           // can be stitched with the previous one immediately after capture.
           // If set to false, all images will be captured first,
           // and stitching will be performed at the end.
-          userCheckStitchingDuringCapture: true,
+          userCheckStitchingDuringCapture: false,
           // Text shown while panorama image is being prepared
           userLoadingText: "Preparing panorama...",
           // Text shown on while taking the first image

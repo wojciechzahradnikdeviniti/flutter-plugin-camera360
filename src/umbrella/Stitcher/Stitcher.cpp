@@ -168,7 +168,8 @@ vector<Mat> convert_to_matlist(vector<string> img_list, bool isvertical)
 bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
             double confidenceThreshold, double panoConfidenceThresh,
             int waveCorrection, int exposureCompensator,
-            double registrationResol, int featureMatcherType, int featureDetectionMethod)
+            double registrationResol, int matcherType,
+            int featureDetectionMethod, int featureMatcherImageRange)
 {
     string input_path_string = inputImagePath;
     vector<string> image_vector_list = getpathlist(input_path_string);
@@ -227,16 +228,24 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
         break;
     }
 
-    // Set feature matcher based on type
+    // Set feature matcher based on type and range width
     float match_conf = confidenceThreshold > 0 ? static_cast<float>(confidenceThreshold) : 0.3f;
 
-    if (featureMatcherType == 1)
+    if (mat_list.size() > 2 && featureMatcherImageRange > 0)
+    {
+        // Use BestOf2NearestRangeMatcher when range width is specified
+        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestRangeMatcher>(
+            false, match_conf, featureMatcherImageRange));
+    }
+    else if (matcherType == 1)
     { // Affine
-        stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(false, match_conf));
+        stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(
+            false, match_conf));
     }
     else
     { // Homography (default)
-        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(false, match_conf));
+        stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(
+            false, match_conf));
     }
 
     // Set the confidence threshold for panorama
