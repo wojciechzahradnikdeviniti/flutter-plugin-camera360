@@ -698,7 +698,7 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
   bool morePhotosNeeded() {
     if (checkStitchingDuringCapture == false) {
       // If stitching during capture is disabled then check if all photos are taken
-      if (nrPhotosTaken == nrPhotos) {
+      if (nrPhotosTaken == 4) {
         return false;
       }
     } else {

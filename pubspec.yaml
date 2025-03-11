@@ -7,6 +7,10 @@ topics:
   - camera
   - panorama
 
+screenshots:
+  - description: 'The UI of the plugin'
+    path: doc/demo.gif
+
 environment:
   sdk: '>=3.5.3 <4.0.0'
   flutter: ">=3.3.0"
