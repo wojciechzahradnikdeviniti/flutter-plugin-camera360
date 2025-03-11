@@ -34,7 +34,6 @@ class Camera360Bindings {
     double confidenceThreshold,
     double panoConfidenceThresh,
     int waveCorrection,
-    int exposureCompensator,
     double registrationResol,
     int featureMatcherType,
     int featureDetectionMethod,
@@ -48,7 +47,6 @@ class Camera360Bindings {
       confidenceThreshold,
       panoConfidenceThresh,
       waveCorrection,
-      exposureCompensator,
       registrationResol,
       featureMatcherType,
       featureDetectionMethod,
@@ -66,7 +64,6 @@ class Camera360Bindings {
               ffi.Double,
               ffi.Double,
               ffi.Int,
-              ffi.Int,
               ffi.Double,
               ffi.Int,
               ffi.Int,
@@ -74,5 +71,5 @@ class Camera360Bindings {
               ffi.Int)>>('stitch');
   late final _stitch = _stitchPtr.asFunction<
       bool Function(ffi.Pointer<ffi.Char>, ffi.Pointer<ffi.Char>, bool, double,
-          double, int, int, double, int, int, int, int)>();
+          double, int, double, int, int, int, int)>();
 }

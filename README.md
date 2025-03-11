@@ -43,7 +43,6 @@ Camera360(
     confidenceThreshold : 0.3,
     panoConfidenceThresh : 1.0,
     waveCorrection : WaveCorrectionType.horizontal,
-    exposureCompensator : ExposureCompensatorType.gainBlocks,
     registrationResol : 0.6, // Default OpenCV value
     featureMatcherType : FeatureMatcherType.homography,
     featureDetectionMethod : FeatureDetectionMethod.orb,

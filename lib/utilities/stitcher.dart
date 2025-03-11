@@ -46,7 +46,6 @@ class Stitcher {
       settings.confidenceThreshold,
       settings.panoConfidenceThresh,
       settings.waveCorrection.value,
-      settings.exposureCompensator.value,
       settings.registrationResol,
       settings.featureMatcherType.value,
       settings.featureDetectionMethod.value,

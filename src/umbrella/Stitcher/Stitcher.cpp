@@ -167,7 +167,7 @@ vector<Mat> convert_to_matlist(vector<string> img_list, bool isvertical)
 
 bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
             double confidenceThreshold, double panoConfidenceThresh,
-            int waveCorrection, int exposureCompensator,
+            int waveCorrection,
             double registrationResol, int matcherType,
             int featureDetectionMethod, int featureMatcherImageRange,
             int blenderType)
@@ -212,23 +212,6 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
     // Set registration resolution
     stitcher->setRegistrationResol(registrationResol);
 
-    // Set exposure compensator based on the selected type
-    switch (exposureCompensator)
-    {
-    case 0:
-        stitcher->setExposureCompensator(makePtr<detail::NoExposureCompensator>());
-        break;
-    case 1:
-        stitcher->setExposureCompensator(makePtr<detail::GainCompensator>());
-        break;
-    case 2:
-        stitcher->setExposureCompensator(makePtr<detail::BlocksGainCompensator>());
-        break;
-    default:
-        stitcher->setExposureCompensator(makePtr<detail::GainCompensator>());
-        break;
-    }
-
     // Set blender based on the selected type
     switch (blenderType)
     {
@@ -268,7 +251,7 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
 
     // Set the confidence threshold for panorama
     // Use the value passed from Dart, or default to 1.0 if not specified
-    float conf_thresh = panoConfidenceThresh > 0 ? static_cast<float>(panoConfidenceThresh) : 1.0f;
+    float conf_thresh = panoConfidenceThresh >= 0 ? static_cast<float>(panoConfidenceThresh) : 1.0f;
     stitcher->setPanoConfidenceThresh(conf_thresh);
 
     // Set feature finder based on the selected method

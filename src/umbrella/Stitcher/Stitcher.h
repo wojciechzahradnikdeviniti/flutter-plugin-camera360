@@ -8,7 +8,7 @@ extern "C"
     // Shared declaration
     bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
                 double confidenceThreshold, double panoConfidenceThresh,
-                int waveCorrection, int exposureCompensator,
+                int waveCorrection,
                 double registrationResol, int featureMatcherType,
                 int featureDetectionMethod, int featureMatcherImageRange,
                 int blenderType);

@@ -27,10 +27,6 @@ class StitcherSettings {
   /// - vertical: Corrects wave effect in vertical panoramas
   final WaveCorrectionType waveCorrection;
 
-  /// Type of exposure compensator
-  /// Default is gain_blocks
-  final ExposureCompensatorType exposureCompensator;
-
   /// Registration resolution in megapixels
   /// Default is 0.6 Mpx
   final double registrationResol;
@@ -63,7 +59,6 @@ class StitcherSettings {
     this.confidenceThreshold = 0.3,
     this.panoConfidenceThresh = 1.0,
     this.waveCorrection = WaveCorrectionType.horizontal,
-    this.exposureCompensator = ExposureCompensatorType.gainBlocks,
     this.registrationResol = 0.6, // Default OpenCV value
     this.featureMatcherType = FeatureMatcherType.homography,
     this.featureDetectionMethod = FeatureDetectionMethod.orb,
@@ -76,7 +71,6 @@ class StitcherSettings {
     double? confidenceThreshold,
     double? panoConfidenceThresh,
     WaveCorrectionType? waveCorrection,
-    ExposureCompensatorType? exposureCompensator,
     double? registrationResol,
     FeatureMatcherType? featureMatcherType,
     FeatureDetectionMethod? featureDetectionMethod,
@@ -87,7 +81,6 @@ class StitcherSettings {
       confidenceThreshold: confidenceThreshold ?? this.confidenceThreshold,
       panoConfidenceThresh: panoConfidenceThresh ?? this.panoConfidenceThresh,
       waveCorrection: waveCorrection ?? this.waveCorrection,
-      exposureCompensator: exposureCompensator ?? this.exposureCompensator,
       registrationResol: registrationResol ?? this.registrationResol,
       featureMatcherType: featureMatcherType ?? this.featureMatcherType,
       featureDetectionMethod:
@@ -104,7 +97,6 @@ class StitcherSettings {
       'confidenceThreshold': confidenceThreshold,
       'panoConfidenceThresh': panoConfidenceThresh,
       'waveCorrection': waveCorrection.value,
-      'exposureCompensator': exposureCompensator.value,
       'registrationResol': registrationResol,
       'featureMatcherType': featureMatcherType.value,
       'featureDetectionMethod': featureDetectionMethod.value,
@@ -121,9 +113,6 @@ class StitcherSettings {
       waveCorrection: map['waveCorrection'] != null
           ? WaveCorrectionType.fromValue(map['waveCorrection'])
           : WaveCorrectionType.horizontal,
-      exposureCompensator: map['exposureCompensator'] != null
-          ? ExposureCompensatorType.fromValue(map['exposureCompensator'])
-          : ExposureCompensatorType.gainBlocks,
       registrationResol: map['registrationResol'] ?? 0.6,
       featureMatcherType: map['featureMatcherType'] != null
           ? FeatureMatcherType.fromValue(map['featureMatcherType'])
