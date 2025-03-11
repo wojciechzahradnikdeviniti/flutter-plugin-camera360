@@ -14,6 +14,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 export 'package:camera_360/models/stitcher_settings.dart';
 export 'package:camera_360/models/enums/enums.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 
 class Camera360 extends StatefulWidget {
   /// Callback called when capture has ended and panorama is prepared
@@ -74,6 +75,10 @@ class Camera360 extends StatefulWidget {
   /// Custom stitcher settings
   final StitcherSettings? stitcherSettings;
 
+  /// Debug mode
+  /// If set to true, the application will download the captured images to the device
+  final bool? debugMode;
+
   const Camera360({
     Key? key,
     required this.onCaptureEnded,
@@ -94,6 +99,7 @@ class Camera360 extends StatefulWidget {
     this.cameraNotReadyContent,
     this.userCheckStitchingDuringCapture = false,
     this.stitcherSettings,
+    this.debugMode = false,
   }) : super(key: key);
 
   @override
@@ -342,6 +348,14 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
     }
   }
 
+  // Download image to the device
+  Future<void> downloadImage(XFile image) async {
+    if (widget.debugMode == true) {
+      // Download the image to the device
+      GallerySaver.saveImage(image.path);
+    }
+  }
+
   // Prepare for taking next image
   void prepareForNextImageCatpure([double? degToNextPositionOverwrite]) {
     // If picture is taken then degToNextPositionOverwrite is null
@@ -421,6 +435,8 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
       if (checkStitchingDuringCapture == false) {
         debugPrint("'Panorama360': Stitching during capture is disabled");
         testStichingImage = image;
+        // Download the image to the device
+        await downloadImage(image);
         prepareForNextImageCatpure();
         return image;
       }
@@ -441,6 +457,9 @@ class _Camera360State extends State<Camera360> with WidgetsBindingObserver {
           );
           nrGoBacksDone = 0;
           prepareForNextImageCatpure();
+
+          // Download the image to the device
+          await downloadImage(testStichingImage);
         } catch (error) {
           debugPrint(error.toString());
           // Delete last taken image

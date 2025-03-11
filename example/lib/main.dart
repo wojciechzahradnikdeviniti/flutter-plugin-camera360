@@ -100,7 +100,6 @@ class _CameraPageState extends State<CameraPage> {
       children: [
         Camera360(
           key: _cameraKey,
-          userNrPhotos: 12,
           // Determines when image stitching is performed.
           // If set to true, the application will check if each newly captured image
           // can be stitched with the previous one immediately after capture.
