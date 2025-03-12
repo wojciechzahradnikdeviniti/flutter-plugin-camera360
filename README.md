@@ -124,6 +124,10 @@ Camera360(
 
 ## [Developer Documentation](doc/developer.md)
 
+## Contribution Needed
+
+We are looking for contributors with C++ and OpenCV expertise to help create a custom stitching method. This method should stitch images in order and manually blend images that are not stitched, ensuring that a 360 panorama is always returned. If you have the necessary skills and are interested in contributing, please reach out to us.
+
 
 
     
