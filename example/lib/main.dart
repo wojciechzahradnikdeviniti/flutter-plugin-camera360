@@ -2,7 +2,8 @@ import 'package:camera_360/camera_360.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:gallery_saver_plus/gallery_saver.dart';
-import 'widgets/stitcher_settings_panel.dart';
+import 'models/camera_settings.dart';
+import 'widgets/settings_tabs.dart';
 import 'widgets/settings_toggle_button.dart';
 import 'widgets/panorama_preview_dialog.dart';
 import 'widgets/reset_button.dart';
@@ -50,10 +51,13 @@ class _CameraPageState extends State<CameraPage> {
   // Key to force rebuild of Camera360 widget
   Key _cameraKey = UniqueKey();
 
+  // Default camera settings
+  CameraSettings cameraSettings = const CameraSettings();
+
   // Optimized for indoor use
   StitcherSettings stitcherSettings = const StitcherSettings(
     confidenceThreshold: 0.25,
-    panoConfidenceThresh: 0.7,
+    panoConfidenceThresh: 0,
     waveCorrection: WaveCorrectionType.horizontal,
     registrationResol: 0.8,
     featureMatcherType: FeatureMatcherType.homography,
@@ -68,7 +72,13 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-  void _updateSettings(StitcherSettings newSettings) {
+  void _updateCameraSettings(CameraSettings newSettings) {
+    setState(() {
+      cameraSettings = newSettings;
+    });
+  }
+
+  void _updateStitcherSettings(StitcherSettings newSettings) {
     setState(() {
       stitcherSettings = newSettings;
     });
@@ -100,27 +110,28 @@ class _CameraPageState extends State<CameraPage> {
       children: [
         Camera360(
           key: _cameraKey,
+          userDeviceVerticalCorrectDeg: cameraSettings.deviceVerticalCorrectDeg,
+          userCapturedImageQuality: cameraSettings.capturedImageQuality,
+          userCapturedImageWidth: cameraSettings.capturedImageWidth,
+          userNrPhotos: cameraSettings.nrPhotos,
           // Determines when image stitching is performed.
-          // If set to true, the application will check if each newly captured image
-          // can be stitched with the previous one immediately after capture.
-          // If set to false, all images will be captured first,
-          // and stitching will be performed at the end.
-          userCheckStitchingDuringCapture: false,
+          userCheckStitchingDuringCapture:
+              cameraSettings.checkStitchingDuringCapture,
           // Text shown while panorama image is being prepared
-          userLoadingText: "Preparing panorama...",
+          userLoadingText: cameraSettings.loadingText,
           // Text shown on while taking the first image
-          userHelperText: "Point the camera at the dot",
+          userHelperText: cameraSettings.helperText,
           // Text shown when user should tilt the device to the left
-          userHelperTiltLeftText: "Tilt left",
+          userHelperTiltLeftText: cameraSettings.helperTiltLeftText,
           // Text shown when user should tilt the device to the right
-          userHelperTiltRightText: "Tilt Right",
-          // Suggested key for iPhone >= 11 is 2 to select the wide-angle camera
-          // On android devices 0 is suggested as at the moment Camera switching is not possible on android
-          userSelectedCameraKey: 2,
+          userHelperTiltRightText: cameraSettings.helperTiltRightText,
+          // Camera key to use
+          userSelectedCameraKey: cameraSettings.selectedCameraKey,
           // Camera selector Visibilitiy
-          cameraSelectorShow: true,
+          cameraSelectorShow: cameraSettings.cameraSelectorShow,
           // Camera selector Info Visibilitiy
-          cameraSelectorInfoPopUpShow: true,
+          cameraSelectorInfoPopUpShow:
+              cameraSettings.cameraSelectorInfoPopUpShow,
           // Custom stitcher settings
           stitcherSettings: stitcherSettings,
           // Camera selector Info Widget
@@ -228,15 +239,17 @@ class _CameraPageState extends State<CameraPage> {
           ),
         ),
 
-        // Settings panel
+        // Settings panel with tabs
         if (isSettingsVisible)
           Positioned(
             bottom: 80,
             left: 0,
             right: 0,
-            child: StitcherSettingsPanel(
-              settings: stitcherSettings,
-              onSettingsChanged: _updateSettings,
+            child: SettingsTabs(
+              cameraSettings: cameraSettings,
+              stitcherSettings: stitcherSettings,
+              onCameraSettingsChanged: _updateCameraSettings,
+              onStitcherSettingsChanged: _updateStitcherSettings,
             ),
           ),
       ],

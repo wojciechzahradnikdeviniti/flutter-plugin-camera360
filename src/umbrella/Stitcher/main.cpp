@@ -71,19 +71,6 @@ int main(int argc, char *argv[])
   int featureMatcherImageRange = getIntOption("--feature-matcher-range", argc, argv, -1);
   int blenderType = getIntOption("--blender-type", argc, argv, 2);
 
-  // Print the parameters
-  std::cout << "Input images: " << inputImagePath << std::endl;
-  std::cout << "Output image: " << outputImagePath << std::endl;
-  std::cout << "Cropped: " << (cropped ? "true" : "false") << std::endl;
-  std::cout << "Confidence threshold: " << confidenceThreshold << std::endl;
-  std::cout << "Panorama confidence threshold: " << panoConfidenceThresh << std::endl;
-  std::cout << "Wave correction: " << waveCorrection << std::endl;
-  std::cout << "Registration resolution: " << registrationResol << std::endl;
-  std::cout << "Matcher type: " << matcherType << std::endl;
-  std::cout << "Feature detection method: " << featureDetectionMethod << std::endl;
-  std::cout << "Feature matcher image range: " << featureMatcherImageRange << std::endl;
-  std::cout << "Blender type: " << blenderType << std::endl;
-
   // Call the stitch function
   bool result = stitch(
       inputImagePath,

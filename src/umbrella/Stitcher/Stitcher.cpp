@@ -198,14 +198,17 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
     case 1: // Horizontal
         stitcher->setWaveCorrection(true);
         stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_HORIZ);
+        printf("'Stitcher': Using Wave Correction: Horizontal\n");
         break;
     case 2: // Vertical
         stitcher->setWaveCorrection(true);
         stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_VERT);
+        printf("'Stitcher': Using Wave Correction: Vertical\n");
         break;
     default: // Default to horizontal
         stitcher->setWaveCorrection(true);
         stitcher->setWaveCorrectKind(detail::WAVE_CORRECT_HORIZ);
+        printf("'Stitcher': Using Wave Correction: Horizontal\n");
         break;
     }
 
@@ -217,15 +220,19 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
     {
     case 0:                                                       // None
         stitcher->setBlender(makePtr<detail::FeatherBlender>(0)); // 0 sharpness means no blending
+        printf("'Stitcher': Using FeatherBlender with Sharpness: 0\n");
         break;
     case 1: // Feather
         stitcher->setBlender(makePtr<detail::FeatherBlender>(0.05f));
+        printf("'Stitcher': Using FeatherBlender with Sharpness: 0.05\n");
         break;
     case 2: // Multiband
         stitcher->setBlender(makePtr<detail::MultiBandBlender>());
+        printf("'Stitcher': Using MultiBandBlender\n");
         break;
     default: // Default to multiband
         stitcher->setBlender(makePtr<detail::MultiBandBlender>());
+        printf("'Stitcher': Using MultiBandBlender\n");
         break;
     }
 
@@ -237,22 +244,27 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
         // Use BestOf2NearestRangeMatcher when range width is specified
         stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestRangeMatcher>(
             false, match_conf, featureMatcherImageRange));
+        printf("'Stitcher': Using BestOf2NearestRangeMatcher feature matcher with Range Width: %d\n", featureMatcherImageRange);
     }
     else if (matcherType == 1)
     { // Affine
         stitcher->setFeaturesMatcher(makePtr<detail::AffineBestOf2NearestMatcher>(
             false, match_conf));
+        printf("'Stitcher': Using AffineBestOf2NearestMatcher feature matcher \n");
     }
     else
     { // Homography (default)
         stitcher->setFeaturesMatcher(makePtr<detail::BestOf2NearestMatcher>(
             false, match_conf));
+        printf("'Stitcher': Using BestOf2NearestMatcher feature matcher \n");
     }
+    printf("'Stitcher': Match Confidence: %f\n", match_conf);
 
     // Set the confidence threshold for panorama
     // Use the value passed from Dart, or default to 1.0 if not specified
     float conf_thresh = panoConfidenceThresh >= 0 ? static_cast<float>(panoConfidenceThresh) : 1.0f;
     stitcher->setPanoConfidenceThresh(conf_thresh);
+    printf("'Stitcher': Using Pano Confidence Threshold: %f\n", conf_thresh);
 
     // Set feature finder based on the selected method
     // Following the approach from the OpenCV stitching example
@@ -261,16 +273,20 @@ bool stitch(char *inputImagePath, char *outputImagePath, bool cropped,
     {
     case 0: // SIFT
         finder = SIFT::create();
+        printf("'Stitcher': Using SIFT feature detector\n");
         break;
     case 1: // AKAZE
         finder = AKAZE::create();
+        printf("'Stitcher': Using AKAZE feature detector\n");
         break;
     case 2: // ORB
         finder = ORB::create();
+        printf("'Stitcher': Using ORB feature detector\n");
         break;
     default:
         // Default to ORB as it's most likely to be available
         finder = ORB::create();
+        printf("'Stitcher': Using ORB feature detector\n");
         break;
     }
 
