@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Model class to hold camera settings
 class CameraSettings {
   /// Vertical correction angle in degrees
